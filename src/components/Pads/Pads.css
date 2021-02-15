@@ -1,0 +1,56 @@
+#pads {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    height: 100%;
+    width: 100%;
+    grid-template-areas: 
+    "clear clear divide multiply"
+    "seven eight nine subtract"
+    "four five six add"
+    "one two three equals"
+    "zero zero decimal equals";
+    column-gap: 1px;
+    row-gap: 1px;
+}
+
+#clear {
+    grid-area: clear;
+    background-color: #AC3939;
+}
+
+#zero {
+    grid-area: zero;
+}
+
+#equals {
+    grid-area: equals;
+    background-color: #004466;
+}
+
+.light-grey {
+    background-color: #666666;
+}
+
+.dark-grey {
+    background-color: #4D4D4D;
+}
+
+
+
+
+#pads div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    color: white;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+#pads div:hover {
+    border: 1px solid rgb(128, 128, 128);
+
+}

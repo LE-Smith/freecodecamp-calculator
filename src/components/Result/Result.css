@@ -1,0 +1,8 @@
+#display {
+    background-color: black;
+    width: 100%;
+    color: white;
+    text-align: right;
+    font-family: monospace;
+    font-size: 26px;
+}

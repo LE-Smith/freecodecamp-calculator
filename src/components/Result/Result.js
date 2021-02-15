@@ -1,10 +1,11 @@
 import React from 'react';
+import './Result.css';
 
 const Result = props => {
 
     return (
-        <div>
-            Result-Field
+        <div id="display">
+            {props.text}
         </div>
     )
 

@@ -1,10 +1,11 @@
 import React from 'react';
+import './Formula.css';
 
 const Formula = props => {
 
     return (
-        <div>
-            Formular-Field
+        <div id="formula">
+            {props.text}
         </div>
     )
 
