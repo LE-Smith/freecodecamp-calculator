@@ -9,7 +9,7 @@ import * as String from './constants/Strings';
 
 const isNumber = string => {
   const isNumberRegEx = /[0123456789]$/;
-  return isNumberRegEx.test(string);
+  return isNumberRegEx.test(string) || typeof string === 'number';
 };
 
 const isOperatorWithoutSubtract = string => {
@@ -27,83 +27,142 @@ const isSubtract = string => {
   return isSubtractRegEx.test(string);
 };
 
+const getOnlyRightNumber = string => {
+  const getAllAfterAssignSignRegEx = /[\\.0123456789e+-]*$/;
+  return string.toString().match(getAllAfterAssignSignRegEx);
+}
+
 function App() {
   const [displayString, setDisplayString] = useState('0');
   const [formulaString, setFormulaString] = useState(' ');
   const [limitActive, setLimitActive] = useState(false);
 
-
   const onMouseDownHandler = event => {
     if (limitActive) return;
-    const newChar = event.target.innerText;
-    const lastCharDisplay = displayString[displayString.length - 1];
-    const preLastCharFormula = formulaString[formulaString.length - 2]; 
+    let newChar = event.target.innerText;
+    let lastCharDisplay = displayString ? displayString.toString()[displayString.length - 1] : null;
+    const preLastCharFormula = formulaString[formulaString.length - 2];
+    let newDisplayString = displayString;
+
+    if (formulaString.toString().includes(String.EQUALS)) {
+      setFormulaString(getOnlyRightNumber(formulaString));
+    }
 
     if (newChar === String.AC) {
       initCalculator();
       return;
     }
+
     if (newChar === String.EQUALS) {
-      const result = eval(formulaString);
+      let result;
+      const oldDisplay = displayString;
+      const oldFormula = formulaString;
+      try {
+        result = eval(formulaString);
+        if (result.toString().length > 4) {
+          result = result.toFixed(4);
+        }
+        setFormulaString(state => state + '=' + result);
+      } catch(err) {
+        result = 'Error!'
+        setFormulaString(result);
+        setTimeout(() => {
+          setDisplayString(oldDisplay);
+          setFormulaString(oldFormula);
+        }, 1000);
+      }
+      result = parseFloat(result);
       setDisplayString(result);
-      setFormulaString(state => state + '=' + result);
       return;
     }
-    
-    if (displayString.length >= 18) {
+
+    if ((displayString.length >= 18 && isNumber(newChar)) || formulaString.length >= 30) {
       showLimitMessage();
       return;
     }
 
-    if (isNumber(lastCharDisplay) && isNumber(newChar)) {
-      if (displayString === String.ZERO) {
-        setDisplayString(newChar);
-        setFormulaString(newChar);
+    if (isNumber(newDisplayString)) {
+      if (newDisplayString.toString().includes(String.DECIMAL)) {
+        newDisplayString = parseFloat(newDisplayString);
       } else {
-        setDisplayString(state => state + newChar);
-        setFormulaString(state => state + newChar);
+        newDisplayString = parseInt(newDisplayString);
       }
     }
 
-    if (isNumber(lastCharDisplay) && isDecimal(newChar)) {
-      if (displayString.includes(String.DECIMAL)) return;
-      setDisplayString(state => state + newChar);
+    if (isNumber(newChar)) {
+      newChar = parseInt(newChar);
+    }
+
+    if (typeof newDisplayString === 'number' && typeof newChar === 'number') {
+      if (newDisplayString === 0) {
+        setDisplayString(newChar);
+        setFormulaString(newChar);
+      } else {
+        newDisplayString = newDisplayString.toString() + newChar;
+        setDisplayString(newDisplayString);
+        setFormulaString(state => state.toString() + newChar);
+      }
+      return;
+    }
+
+    if (typeof newDisplayString === 'number' && isDecimal(newChar)) {
+      console.log(typeof displayString)
+      if (displayString.toString().includes(String.DECIMAL)) return;
+      newDisplayString = newDisplayString.toString() + newChar;
+      setDisplayString(newDisplayString);
       if (displayString === String.ZERO) {
         setFormulaString(state => state + 0 + newChar);
       } else {
         setFormulaString(state => state + newChar);
       }
+      return;
     }
 
-    if (isNumber(lastCharDisplay) && (isOperatorWithoutSubtract(newChar))) {
+    if (
+      typeof newDisplayString === 'number' &&
+      isOperatorWithoutSubtract(newChar)
+    ) {
       if (displayString === String.ZERO && formulaString === ' ') return;
       setDisplayString(newChar);
       setFormulaString(state => state + newChar);
+      return;
     }
 
-    if (isNumber(lastCharDisplay) && (isSubtract(newChar))) {
+    if (typeof newDisplayString === 'number' && isSubtract(newChar)) {
       setDisplayString(newChar);
       setFormulaString(state => state + newChar);
+      return;
     }
 
-    if (isDecimal(lastCharDisplay) && isNumber(newChar)) {
-      setDisplayString(state => state + newChar);
+    if (isDecimal(lastCharDisplay) && typeof newChar === 'number') {
+      newDisplayString = newDisplayString + newChar;
+      setDisplayString(newDisplayString);
       setFormulaString(state => state + newChar);
+      return;
     }
 
-    if (isDecimal(lastCharDisplay) && (isOperatorWithoutSubtract(newChar) || isSubtract(newChar))) {
+    if (
+      isDecimal(lastCharDisplay) &&
+      (isOperatorWithoutSubtract(newChar) || isSubtract(newChar))
+    ) {
       setDisplayString(newChar);
-      setFormulaString(state => state + 0 + newChar);
+      const newFormulaString = formulaString;
+      const tempString = newFormulaString.split('');
+      tempString.splice(-1, 1, newChar);
+      setFormulaString(tempString.join(''));
+      return;
     }
 
-    if (isOperatorWithoutSubtract(lastCharDisplay) && isNumber(newChar)) {
+    if (isOperatorWithoutSubtract(lastCharDisplay) && typeof newChar === 'number') {
       setDisplayString(newChar);
       setFormulaString(state => state + newChar);
+      return;
     }
 
-    if (isOperatorWithoutSubtract(lastCharDisplay) && isDecimal(newChar)) {
+    if ((isOperatorWithoutSubtract(lastCharDisplay) || isSubtract(lastCharDisplay)) && isDecimal(newChar)) {
       setDisplayString(0 + newChar);
       setFormulaString(state => state + 0 + newChar);
+      return;
     }
 
     if (isOperatorWithoutSubtract(lastCharDisplay) && isSubtract(newChar)) {
@@ -116,6 +175,7 @@ function App() {
         tempString.splice(-1, 1, newChar);
         setFormulaString(tempString.join(''));
       };
+      return;
     }
 
     if (isOperatorWithoutSubtract(lastCharDisplay) && isOperatorWithoutSubtract(newChar)) {
@@ -125,18 +185,20 @@ function App() {
       const tempString = newFormulaString.split('');
       tempString.splice(-1, 1, newChar);
       setFormulaString(tempString.join(''));
+      return;
     }
 
-    if (isSubtract(lastCharDisplay) && isNumber(newChar)) {
+    if (isSubtract(lastCharDisplay) && typeof newChar === 'number') {
       setDisplayString(newChar);
       setFormulaString(state => state + newChar);
+      return;
     }
 
     if (isSubtract(lastCharDisplay) && isSubtract(newChar)) {
       setDisplayString(newChar);
-      console.log(preLastCharFormula);
       if (!isNumber(preLastCharFormula)) return;
       setFormulaString(state => state + newChar);
+      return;
     }
 
     if (isSubtract(lastCharDisplay) && isOperatorWithoutSubtract(newChar)) {
@@ -150,12 +212,9 @@ function App() {
         tempString.splice(-1, 1, newChar);
       }
       setFormulaString(tempString.join(''));
+      return;
     }
-
-
-
   };
-
 
   const initCalculator = () => {
     setDisplayString('0');

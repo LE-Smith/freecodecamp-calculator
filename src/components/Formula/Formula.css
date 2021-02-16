@@ -9,4 +9,5 @@
     justify-content: flex-end;
     align-items: center;
     font-family: RobotoMono;
+    overflow: hidden;
 }
