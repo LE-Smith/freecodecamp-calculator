@@ -98,7 +98,7 @@ function App() {
         setDisplayString(newChar);
         setFormulaString(newChar);
       } else {
-        newDisplayString = newDisplayString.toString() + newChar;
+        newDisplayString = parseInt(newDisplayString.toString() + newChar);
         setDisplayString(newDisplayString);
         setFormulaString(state => state.toString() + newChar);
       }
@@ -135,7 +135,7 @@ function App() {
     }
 
     if (isDecimal(lastCharDisplay) && typeof newChar === 'number') {
-      newDisplayString = newDisplayString + newChar;
+      newDisplayString = parseFloat(newDisplayString + newChar);
       setDisplayString(newDisplayString);
       setFormulaString(state => state + newChar);
       return;
@@ -154,7 +154,7 @@ function App() {
     }
 
     if (isOperatorWithoutSubtract(lastCharDisplay) && typeof newChar === 'number') {
-      setDisplayString(newChar);
+      setDisplayString(parseInt(newChar));
       setFormulaString(state => state + newChar);
       return;
     }
@@ -189,7 +189,7 @@ function App() {
     }
 
     if (isSubtract(lastCharDisplay) && typeof newChar === 'number') {
-      setDisplayString(newChar);
+      setDisplayString(parseInt(newChar));
       setFormulaString(state => state + newChar);
       return;
     }
