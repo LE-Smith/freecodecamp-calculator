@@ -98,15 +98,13 @@ function App() {
         setDisplayString(newChar);
         setFormulaString(newChar);
       } else {
-        newDisplayString = parseInt(newDisplayString.toString() + newChar);
-        setDisplayString(newDisplayString);
+        setDisplayString(state => state.toString() + newChar);
         setFormulaString(state => state.toString() + newChar);
       }
       return;
     }
 
     if (typeof newDisplayString === 'number' && isDecimal(newChar)) {
-      console.log(typeof displayString)
       if (displayString.toString().includes(String.DECIMAL)) return;
       newDisplayString = newDisplayString.toString() + newChar;
       setDisplayString(newDisplayString);
