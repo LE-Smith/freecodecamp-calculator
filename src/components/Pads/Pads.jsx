@@ -6,7 +6,7 @@ import * as String from '../../constants/Strings';
 const Pads = props => {
 
     return (
-        <div id="pads" onMouseDown={props.onMouseDown}>
+        <div id="pads" onClick={props.onMouseClick}>
             <div id="clear">{String.AC}</div>
             <div className="light-grey" id="divide">{String.DIVIDE}</div>
             <div className="light-grey" id="multiply">{String.MULTIPLY}</div>

@@ -37,7 +37,7 @@ function App() {
   const [formulaString, setFormulaString] = useState(' ');
   const [limitActive, setLimitActive] = useState(false);
 
-  const onMouseDownHandler = event => {
+  const onMouseClickHandler = event => {
     if (limitActive) return;
     let newChar = event.target.innerText;
     let lastCharDisplay = displayString ? displayString.toString()[displayString.length - 1] : null;
@@ -133,7 +133,7 @@ function App() {
     }
 
     if (isDecimal(lastCharDisplay) && typeof newChar === 'number') {
-      newDisplayString = parseFloat(newDisplayString + newChar);
+      newDisplayString = newDisplayString + newChar;
       setDisplayString(newDisplayString);
       setFormulaString(state => state + newChar);
       return;
@@ -233,7 +233,7 @@ function App() {
     <div className="App">
       <Formula text={formulaString} />
       <Result text={displayString} />
-      <Pads onMouseDown={onMouseDownHandler} />
+      <Pads onMouseClick={onMouseClickHandler} />
     </div>
   );
 }
